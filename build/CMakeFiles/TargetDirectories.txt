@@ -1,0 +1,3 @@
+/Users/sarvar/Documents/HomeWork OrzaTrading/build/CMakeFiles/HWOzmaTrading.dir
+/Users/sarvar/Documents/HomeWork OrzaTrading/build/CMakeFiles/edit_cache.dir
+/Users/sarvar/Documents/HomeWork OrzaTrading/build/CMakeFiles/rebuild_cache.dir
