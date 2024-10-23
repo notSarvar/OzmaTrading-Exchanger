@@ -1,5 +1,16 @@
 #include "include/order_reader.h"
 
+OrderReader::OrderReader(RingBuffer<Order> &buffer, OrderBook &orderBook, int max_price,
+              int max_size, int N, int M, int U)
+      : buffer(buffer), orderBook(orderBook), max_price(max_price),
+        max_size(max_size), N(N), M(M), U(U) {
+    for (int i = 0; i < U; ++i) {
+      auto hash = "auth_hash_" + std::to_string(i);
+      orderBook.auth_hashes.push_back(hash);
+      orderBook.userOrderLimits[hash] = OrderBook::UserOrderLimits();
+      }
+    }
+
 int32_t OrderReader::order_count = 0;
 
 void OrderReader::readOrders() {

@@ -9,14 +9,7 @@
 class OrderGenerator {
 public:
   OrderGenerator(RingBuffer<Order> &buffer, int max_price,
-                 int max_size, int U)
-      : buffer(buffer), max_price(max_price),
-        max_size(max_size), U(U) {
-      for (int i = 0; i < U; ++i) {
-            auto hash = "auth_hash_" + std::to_string(i);
-            auth_hashes.push_back(hash);
-      }
-    }
+                 int max_size, int U);
 
   void generate();
 

@@ -2,8 +2,10 @@ cmake_minimum_required(VERSION 3.21)
 project(HWOzmaTrading)
 
 set(CMAKE_CXX_STANDARD 17)
-FIND_PACKAGE(Boost 1.40 COMPONENTS system REQUIRED)
-FIND_PACKAGE(Threads REQUIRED)
-INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR} .)
+find_package(OpenSSL REQUIRED)
+INCLUDE_DIRECTORIES(${OPENSSL_INCLUDE_DIR} .)
 
-add_executable(HWOzmaTrading src/main.cpp)
+file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE HEADERS "include/*.h" "include/*.hpp")
+
+add_executable(HWOzmaTrading ${SOURCES} ${HEADERS})

@@ -1,6 +1,16 @@
 #include "include/order_generator.h"
 #include "include/hash_order.h"
 
+OrderGenerator::OrderGenerator(RingBuffer<Order> &buffer, int max_price,
+                 int max_size, int U)
+      : buffer(buffer), max_price(max_price),
+        max_size(max_size), U(U) {
+      for (int i = 0; i < U; ++i) {
+            auto hash = "auth_hash_" + std::to_string(i);
+            auth_hashes.push_back(hash);
+      }
+    }
+
 void OrderGenerator::generate() {
     std::random_device rd;
     std::mt19937 gen(rd());
