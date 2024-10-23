@@ -1,9 +1,9 @@
 #include "include/order_reader.h"
 
-OrderReader::OrderReader(RingBuffer<Order> &buffer, OrderBook &orderBook, int max_price,
-              int max_size, int N, int M, int U)
-      : buffer(buffer), orderBook(orderBook), max_price(max_price),
-        max_size(max_size), N(N), M(M), U(U) {
+OrderReader::OrderReader(RingBuffer<Order> &buffer, OrderBook &orderBook, int min_price,
+              int max_price, int N, int M, int U)
+      : buffer(buffer), orderBook(orderBook), min_price(min_price),
+        max_price(max_price), N(N), M(M), U(U) {
     for (int i = 0; i < U; ++i) {
       auto hash = "auth_hash_" + std::to_string(i);
       orderBook.auth_hashes.push_back(hash);
@@ -53,8 +53,8 @@ std::string OrderReader::validateAuthHash(const Order &order) {
   }
 
 bool OrderReader::validateOrder(const Order &order) {
-    return order.price > 0 && order.price <= max_price && order.size > 0 &&
-           order.size <= max_size && (order.side == 0 || order.side == 1);
+    return order.price >= min_price && order.price <= max_price && order.size > 0 &&
+           order.size <= N && (order.side == 0 || order.side == 1);
   }
 
 bool OrderReader::checkUserLimits(std::string user_hash, const Order &order) {
