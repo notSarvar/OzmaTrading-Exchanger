@@ -17,6 +17,8 @@ void OrderReader::readOrders() {
   while (true) {
     Order order;
     if (buffer.pop(order)) {
+      std::cout << "Read order: " << order.price << " " << order.size << " "
+                << order.side << " " << order.auth_hash << std::endl;
       try {
         auto user = validateAuthHash(order);
         if (checkUserLimits(user, order) && validateOrder(order)) {

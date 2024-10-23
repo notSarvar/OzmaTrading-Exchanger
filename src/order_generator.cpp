@@ -1,6 +1,6 @@
 #include "include/order_generator.h"
 #include "include/hash_order.h"
-
+#include <iostream>
 OrderGenerator::OrderGenerator(RingBuffer<Order> &buffer, int min_price,
                                int max_price, int N, int U)
     : buffer(buffer), min_price(min_price), max_price(max_price), N(N), U(U) {
@@ -25,6 +25,8 @@ void OrderGenerator::generate() {
     order.side = side_dist(gen);
     order.auth_hash = generateAuthHash(order, auth_hashes[auth_dist(gen)]);
     buffer.push(order);
+    std::cout << "Generated order: " << order.price << " " << order.size << " "
+              << order.side << " " << order.auth_hash << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 }

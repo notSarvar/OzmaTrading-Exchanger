@@ -1,11 +1,13 @@
 #include "include/order_book.h"
 
 void OrderBook::addOrder(int32_t id, const Order &order) {
+  std::cout << "Adding order: " << id << " " << order.price << " " << order.size
+            << " " << order.side << " " << order.auth_hash << std::endl;
   std::lock_guard<std::mutex> lock(mutex);
   if (order.side == 0) {
-    buy_orders[order.price] = std::make_pair(id, order);
+    buy_orders[order.price].insert(std::make_pair(id, order));
   } else {
-    sell_orders[order.price] = std::make_pair(id, order);
+    sell_orders[order.price].insert(std::make_pair(id, order));
   }
 }
 
@@ -13,33 +15,29 @@ void OrderBook::match() {
   while (true) {
     {
       std::lock_guard<std::mutex> lock(mutex);
-      while (!buy_orders.empty() && !sell_orders.empty()) {
-        auto buy_it = buy_orders.begin();
-        auto sell_it = sell_orders.begin();
+      
+      for (auto &buy_pair : buy_orders) {
+        for (auto &sell_pair : sell_orders) {
+          auto buy_order_set = buy_pair.second;
+          auto sell_order_set = sell_pair.second;
 
-        if (buy_it->first >= sell_it->first) {
-          Order &buy_order = buy_it->second.second;
-          Order &sell_order = sell_it->second.second;
-          logger.logMatch(buy_order, sell_order);
-          int matched_size = std::min(buy_order.size, sell_order.size);
-          buy_order.size -= matched_size;
-          sell_order.size -= matched_size;
-
-          updateUserLimits(buy_order.auth_hash, matched_size, 1);
-          updateUserLimits(sell_order.auth_hash, matched_size, 0);
-
-          if (buy_order.size == 0) {
-            buy_orders.erase(buy_it);
+          for (const auto &buy_order_pair : buy_order_set) {
+            for (const auto &sell_order_pair : sell_order_set) {
+              if (buy_order_pair.first >=
+                  sell_order_pair.first) { 
+                logger.logMatch(buy_order_pair.second, sell_order_pair.second);
+                
+                sell_orders[sell_pair.first].erase(sell_order_pair);
+                buy_orders[buy_pair.first].erase(buy_order_pair);
+                break; 
+              }
+            }
           }
-          if (sell_order.size == 0) {
-            sell_orders.erase(sell_it);
-          }
-        } else {
-          break;
         }
       }
     }
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(
+        std::chrono::milliseconds(100)); 
   }
 }
 
