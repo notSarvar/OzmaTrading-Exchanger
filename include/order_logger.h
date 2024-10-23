@@ -10,13 +10,15 @@ class OrderLogger {
   friend class OrderBook;
 
 public:
-  OrderLogger(RingBuffer<Order> &buffer, const std::string &filename)
+  OrderLogger(RingBuffer<std::string> &buffer, const std::string &filename)
         : buffer(buffer), filename(filename) {}
 
   void log();
 
+  void logMatch(const Order &buy_order, const Order &sell_order);
+
 private:
-  RingBuffer<Order> &buffer;
+  RingBuffer<std::string> &buffer;
     std::string filename;
 };
  

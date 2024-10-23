@@ -21,8 +21,8 @@ int main(int argc, char** argv) {
     std::istringstream(argv[5]) >> max_size;
     
 
-    RingBuffer<Order> orderBuffer(100);
-    RingBuffer<Order> logBuffer(100);
+    RingBuffer<Order> orderBuffer(U * M);
+    RingBuffer<std::string> logBuffer(U * M);
 
     OrderLogger logger(logBuffer, "orders.log");
     OrderBook orderBook(logger);

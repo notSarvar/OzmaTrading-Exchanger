@@ -23,6 +23,8 @@ void OrderBook::match() {
         buy_order.size -= matched_size;
         sell_order.size -= matched_size;
 
+        logger.logMatch(buy_order, sell_order);
+        
         updateUserLimits(buy_order.auth_hash, matched_size, 1);
         updateUserLimits(sell_order.auth_hash, matched_size, 0);
 
