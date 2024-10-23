@@ -1,7 +1,5 @@
 #pragma once
 
-#include <openssl/hmac.h>
-#include <openssl/sha.h>
 #include <sstream>
 #include <iomanip>
 #include <string>

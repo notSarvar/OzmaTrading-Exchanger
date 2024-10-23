@@ -8,15 +8,16 @@
 
 class OrderGenerator {
 public:
-  OrderGenerator(RingBuffer<Order> &buffer, int max_price,
-                 int max_size, int U);
+  OrderGenerator(RingBuffer<Order> &buffer, int min_price,
+                 int max_price, int N, int U);
 
   void generate();
 
 private:
   RingBuffer<Order> &buffer;
   std::vector<std::string> auth_hashes;
+  int min_price;
   int max_price;
-  int max_size;
+  int N;
   int U;
 };

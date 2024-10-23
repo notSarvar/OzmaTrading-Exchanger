@@ -11,8 +11,8 @@
 
 class OrderReader {
 public:
-  OrderReader(RingBuffer<Order> &buffer, OrderBook &orderBook, int max_price,
-              int max_size, int N, int M, int U);
+  OrderReader(RingBuffer<Order> &buffer, OrderBook &orderBook, int min_price,
+              int max_price, int N, int M, int U);
 
   void readOrders();
 
@@ -26,8 +26,8 @@ private:
   static int32_t order_count;
   RingBuffer<Order> &buffer;
   OrderBook &orderBook;
+  int min_price;
   int max_price;
-  int max_size;
   int N; // max size
   int M; // max orders count
   int U; // users count

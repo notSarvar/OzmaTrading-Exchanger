@@ -9,16 +9,16 @@
 
 int main(int argc, char** argv) {
     if (argc != 6) {
-        std::cerr << "Usage: " << argv[0] << "<U> <N> <M> <max_price> <max_size>" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <U> <N> <M> <min_price> <max_price>" << std::endl;
         return 1;
     }
 
-    int N, M, max_price, max_size, U;
+    int U, N, M, min_price, max_price;
     std::istringstream(argv[1]) >> U;
     std::istringstream(argv[2]) >> N;
     std::istringstream(argv[3]) >> M;
-    std::istringstream(argv[4]) >> max_price;
-    std::istringstream(argv[5]) >> max_size;
+    std::istringstream(argv[4]) >> min_price;
+    std::istringstream(argv[5]) >> max_price;
     
 
     RingBuffer<Order> orderBuffer(U * M);
@@ -27,8 +27,8 @@ int main(int argc, char** argv) {
     OrderLogger logger(logBuffer, "orders.log");
     OrderBook orderBook(logger);
 
-    OrderGenerator generator(orderBuffer, max_price, max_size, U);
-    OrderReader reader(orderBuffer, orderBook, max_price, max_size, N, M, U);
+    OrderGenerator generator(orderBuffer, min_price, max_price, N, U);
+    OrderReader reader(orderBuffer, orderBook, min_price, max_price, N, M, U);
 
     std::thread generatorThread(&OrderGenerator::generate, &generator);
     std::thread readerThread(&OrderReader::readOrders, &reader);
