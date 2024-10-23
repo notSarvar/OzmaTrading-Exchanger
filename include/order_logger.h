@@ -11,7 +11,7 @@ class OrderLogger {
 
 public:
   OrderLogger(RingBuffer<std::string> &buffer, const std::string &filename)
-        : buffer(buffer), filename(filename) {}
+      : buffer(buffer), filename(filename) {}
 
   void log();
 
@@ -19,6 +19,5 @@ public:
 
 private:
   RingBuffer<std::string> &buffer;
-    std::string filename;
+  std::string filename;
 };
- 

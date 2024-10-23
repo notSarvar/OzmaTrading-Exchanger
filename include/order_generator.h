@@ -8,8 +8,8 @@
 
 class OrderGenerator {
 public:
-  OrderGenerator(RingBuffer<Order> &buffer, int min_price,
-                 int max_price, int N, int U);
+  OrderGenerator(RingBuffer<Order> &buffer, int min_price, int max_price, int N,
+                 int U);
 
   void generate();
 

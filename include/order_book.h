@@ -1,10 +1,12 @@
 #pragma once
 
 #include <algorithm>
+#include <chrono>
 #include <cstddef>
 #include <functional>
 #include <iostream>
 #include <mutex>
+#include <thread>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -32,7 +34,7 @@ private:
     std::unordered_set<int32_t> sell_orders;
   };
 
-  void updateUserLimits(const std::string &auth_hash, int size, int side) ;
+  void updateUserLimits(const std::string &auth_hash, int size, int side);
 
   std::unordered_map<int32_t, std::pair<int32_t, Order>> buy_orders;
   std::unordered_map<int32_t, std::pair<int32_t, Order>> sell_orders;
