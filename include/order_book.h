@@ -1,71 +1,43 @@
 #pragma once
 
 #include <algorithm>
+#include <cstddef>
+#include <functional>
 #include <iostream>
 #include <mutex>
 #include <unordered_map>
+#include <unordered_set>
+#include <utility>
 #include <vector>
 
 #include "order.h"
+#include "order_logger.h"
 #include "ring_buffer.hpp"
 
 class OrderBook {
+  friend class OrderReader;
+
 public:
-  OrderBook(size_t max_size) : buy_orders(max_size), sell_orders(max_size) {}
+  OrderBook(OrderLogger &logger) : logger(logger) {}
 
-  void addOrder(const Order &order) {
-    std::lock_guard<std::mutex> lock(mutex);
-    if (order.side == 1) { // Buy
-      buy_orders.push(order);
-    } else { // Sell
-      sell_orders.push(order);
-    }
-    matchOrders();
-  }
+  void addOrder(int32_t id, const Order &order);
 
-  std::vector<Order> getOrders() {
-    std::lock_guard<std::mutex> lock(mutex);
-    std::vector<Order> all_orders;
-    Order order;
-    while (buy_orders.pop(order)) {
-      all_orders.push_back(order);
-    }
-    while (sell_orders.pop(order)) {
-      all_orders.push_back(order);
-    }
-    return all_orders;
-  }
+  void match();
 
 private:
-  void matchOrders() {
-    while (!buy_orders.empty() && !sell_orders.empty()) {
-      Order buy_order, sell_order;
-      if (buy_orders.pop(buy_order) && sell_orders.pop(sell_order)) {
-        if (buy_order.price >= sell_order.price) {
-          int matched_size = std::min(buy_order.size, sell_order.size);
-          buy_order.size -= matched_size;
-          sell_order.size -= matched_size;
+  struct UserOrderLimits {
+    int buySize = 0;
+    int sellSize = 0;
+    std::unordered_set<int32_t> buy_orders;
+    std::unordered_set<int32_t> sell_orders;
+  };
 
-          std::cout << "Matched: Buy " << buy_order.price << " with Sell "
-                    << sell_order.price << " for size " << matched_size
-                    << std::endl;
+  void updateUserLimits(const std::string &auth_hash, int size, int side) ;
 
-          if (buy_order.size > 0) {
-            buy_orders.push(buy_order);
-          }
-          if (sell_order.size > 0) {
-            sell_orders.push(sell_order);
-          }
-        } else {
-          buy_orders.push(buy_order);
-          sell_orders.push(sell_order);
-          break;
-        }
-      }
-    }
-  }
-
-  RingBuffer<Order> buy_orders;
-  RingBuffer<Order> sell_orders;
+  std::unordered_map<int32_t, std::pair<int32_t, Order>> buy_orders;
+  std::unordered_map<int32_t, std::pair<int32_t, Order>> sell_orders;
+  std::vector<std::string> auth_hashes;
+  std::unordered_map<std::string, UserOrderLimits> userOrderLimits;
+  OrderLogger &logger;
   std::mutex mutex;
 };
