@@ -2,7 +2,7 @@
 
 void OrderBook::addOrder(int32_t id, const Order &order) {
   std::lock_guard<std::mutex> lock(mutex);
-  if (order.side == 0) {
+  if (order.side == 1) {
     buy_orders[order.price].insert(std::make_pair(id, order));
   } else {
     sell_orders[order.price].insert(std::make_pair(id, order));
