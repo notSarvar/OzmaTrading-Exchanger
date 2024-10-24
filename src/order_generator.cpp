@@ -25,8 +25,6 @@ void OrderGenerator::generate() {
     order.side = side_dist(gen);
     order.auth_hash = generateAuthHash(order, auth_hashes[auth_dist(gen)]);
     buffer.push(order);
-    std::cout << "Generated order: " << order.price << " " << order.size << " "
-              << order.side << " " << order.auth_hash << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 }

@@ -12,7 +12,6 @@ void OrderBook::addOrder(int32_t id, const Order &order) {
 void OrderBook::match() {
   while (true) {
     {
-      get_orders();
       std::lock_guard<std::mutex> lock(mutex);
       for (auto &buy_pair : buy_orders) {
         for (auto &sell_pair : sell_orders) {
@@ -25,6 +24,7 @@ void OrderBook::match() {
                   sell_order_pair.first) { 
                 
                 logger.logMatch(buy_order_pair.second, sell_order_pair.second);
+                
                 updateUserLimits(get_user(buy_order_pair.first),
                                  buy_order_pair.second.size, 1);
                 updateUserLimits(get_user(sell_order_pair.first),
