@@ -7,8 +7,6 @@
 #include "ring_buffer.hpp"
 
 class OrderLogger {
-  friend class OrderBook;
-
 public:
   OrderLogger(RingBuffer<std::string> &buffer, const std::string &filename)
       : buffer(buffer), filename(filename) {}

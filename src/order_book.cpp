@@ -45,7 +45,6 @@ void OrderBook::match() {
 
 void OrderBook::updateUserLimits(const std::string &auth_hash, int size,
                                  int side) {
-  std::lock_guard<std::mutex> lock(mutex);
   auto &limits = userOrderLimits[auth_hash];
   if (side == 1) { // Buy
     limits.buySize -= size;
@@ -55,7 +54,6 @@ void OrderBook::updateUserLimits(const std::string &auth_hash, int size,
 }
 
 std::string OrderBook::get_user(int32_t order_id) {
-  std::lock_guard<std::mutex> lock(mutex);
   for (const auto &user : userOrderLimits) {
     if (user.second.buy_orders.find(order_id) !=
             user.second.buy_orders.end() ||

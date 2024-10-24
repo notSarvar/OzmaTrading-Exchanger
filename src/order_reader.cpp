@@ -44,9 +44,9 @@ void OrderReader::readOrders() {
 }
 
 std::string OrderReader::validateAuthHash(const Order &order) {
-  for (const auto &hash : orderBook.auth_hashes) {
-    if (generateAuthHash(order, hash) == order.auth_hash) {
-      return hash;
+  for (const auto &user_hash : orderBook.auth_hashes) {
+    if (generateAuthHash(order, user_hash) == order.auth_hash) {
+      return user_hash;
     }
   }
   throw("Invalid auth_hash");
