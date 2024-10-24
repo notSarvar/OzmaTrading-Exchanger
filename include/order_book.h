@@ -15,7 +15,6 @@
 #include "order.h"
 #include "order_logger.h"
 #include "ring_buffer.hpp"
-#include "fast_hash.h"
 
 namespace std {
     template <>
@@ -50,6 +49,10 @@ public:
 
   void match();
 
+  std::string get_user(int32_t order_id);
+
+  void get_orders();
+
 private:
   struct UserOrderLimits {
     int buySize = 0;
@@ -62,6 +65,7 @@ private:
 
   std::unordered_map<int32_t, std::unordered_set<std::pair<int32_t, Order>, pair_hash>> buy_orders;
   std::unordered_map<int32_t, std::unordered_set<std::pair<int32_t, Order>, pair_hash>> sell_orders;
+  
   std::vector<std::string> auth_hashes;
   std::unordered_map<std::string, UserOrderLimits> userOrderLimits;
   OrderLogger &logger;
