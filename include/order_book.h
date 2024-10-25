@@ -1,10 +1,16 @@
 #pragma once
 
+#include "hash_order.h"
+#include "order.h"
+#include "order_logger.h"
+#include "ring_buffer.hpp"
+
 #include <algorithm>
 #include <chrono>
 #include <cstddef>
 #include <functional>
 #include <iostream>
+#include <map>
 #include <mutex>
 #include <thread>
 #include <unordered_map>
@@ -12,62 +18,47 @@
 #include <utility>
 #include <vector>
 
-#include "order.h"
-#include "order_logger.h"
-#include "ring_buffer.hpp"
-
-namespace std {
-    template <>
-    struct hash<Order> {
-        std::size_t operator()(const Order& order) const {
-            std::size_t h1 = std::hash<int32_t>{}(order.price);
-            std::size_t h2 = std::hash<int32_t>{}(order.size);
-            std::size_t h3 = std::hash<int>{}(order.side);
-            std::size_t h4 = std::hash<std::string>{}(order.auth_hash);
-            return h1 ^ (h2 << 1) ^ (h3 << 2) ^ (h4 << 3);
-        }
-    };
-}
-
-struct pair_hash {
-    template <class T1, class T2>
-    std::size_t operator () (const std::pair<T1, T2>& p) const {
-        std::size_t h1 = std::hash<T1>{}(p.first);
-        std::size_t h2 = std::hash<T2>{}(p.second);
-        return h1 ^ (h2 << 1); 
-    }
-};
-
-
 class OrderBook {
   friend class OrderReader;
 
 public:
-  OrderBook(OrderLogger &logger) : logger(logger) {}
+  OrderBook(OrderLogger &logger, int32_t min_price, int32_t max_price,
+            int32_t N, int32_t M, int32_t U)
+      : logger_(logger), min_price_(min_price), max_price_(max_price), N_(N), M_(M),
+        U_(U) {}
 
-  void addOrder(int32_t id, const Order &order);
+  void StopMatch();
 
-  void match();
+  void AddOrder(int32_t id, const Order &order);
 
-  std::string get_user(int32_t order_id);
+  void MatchUntil();
 
-  void get_orders();
+  void MatchOrders();
 
 private:
   struct UserOrderLimits {
-    int buySize = 0;
-    int sellSize = 0;
-    std::unordered_set<int32_t> buy_orders;
-    std::unordered_set<int32_t> sell_orders;
+    int32_t buy_size = 0;
+    int32_t sell_size = 0;
+    int32_t orders_count = 0;
   };
 
-  void updateUserLimits(const std::string &auth_hash, int size, int side);
+  void UpdateUserLimits(const std::string &auth_hash, int32_t size, Order::Side side,
+                        bool is_add = false);
 
-  std::unordered_map<int32_t, std::unordered_set<std::pair<int32_t, Order>, pair_hash>> buy_orders;
-  std::unordered_map<int32_t, std::unordered_set<std::pair<int32_t, Order>, pair_hash>> sell_orders;
-  
-  std::vector<std::string> auth_hashes;
-  std::unordered_map<std::string, UserOrderLimits> userOrderLimits;
-  OrderLogger &logger;
-  std::mutex mutex;
+  void UpdateOrders();
+
+  std::string FindUser(const Order &order);
+
+  std::map<int32_t, std::vector<Order>> buy_orders_;
+  std::map<int32_t, std::vector<Order>> sell_orders_;
+  std::vector<std::string> user_auth_hashes_;
+  std::unordered_map<std::string, UserOrderLimits> user_order_limits_;
+  OrderLogger &logger_;
+  std::mutex mutex_;
+  std::atomic_bool stop_match_ = false;
+  int32_t min_price_;
+  int32_t max_price_;
+  int32_t N_; // max size
+  int32_t M_; // max orders count
+  int32_t U_; // users count
 };

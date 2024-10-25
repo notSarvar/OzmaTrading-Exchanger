@@ -1,11 +1,11 @@
+#include "include/order_generator.h"
+#include "include/order_logger.h"
+#include "include/order_reader.h"
+
 #include <iostream>
 #include <sstream>
 #include <thread>
 #include <vector>
-
-#include "include/order_generator.h"
-#include "include/order_logger.h"
-#include "include/order_reader.h"
 
 int main(int argc, char **argv) {
   if (argc != 6) {
@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  int U, N, M, min_price, max_price;
+  int32_t U, N, M, min_price, max_price;
   std::istringstream(argv[1]) >> U;
   std::istringstream(argv[2]) >> N;
   std::istringstream(argv[3]) >> M;
@@ -25,15 +25,22 @@ int main(int argc, char **argv) {
   RingBuffer<std::string> logBuffer(U * M);
 
   OrderLogger logger(logBuffer, "orders.log");
-  OrderBook orderBook(logger);
+  OrderBook orderBook(logger, min_price, max_price, N, M, U);
 
   OrderGenerator generator(orderBuffer, min_price, max_price, N, U);
-  OrderReader reader(orderBuffer, orderBook, min_price, max_price, N, M, U);
+  OrderReader reader(orderBuffer, orderBook);
 
-  std::thread generatorThread(&OrderGenerator::generate, &generator);
-  std::thread readerThread(&OrderReader::readOrders, &reader);
-  std::thread matcherThread(&OrderBook::match, &orderBook);
-  std::thread loggerThread(&OrderLogger::log, &logger);
+  std::thread generatorThread(&OrderGenerator::GenerateUntil, &generator);
+  std::thread readerThread(&OrderReader::Read, &reader);
+  std::thread matcherThread(&OrderBook::MatchUntil, &orderBook);
+  std::thread loggerThread(&OrderLogger::ExportLogUntil, &logger);
+
+  std::this_thread::sleep_for(std::chrono::seconds(10));
+
+  generator.StopGenerator();
+  reader.StopReader();
+  orderBook.StopMatch();
+  logger.StopExport();
 
   generatorThread.join();
   readerThread.join();

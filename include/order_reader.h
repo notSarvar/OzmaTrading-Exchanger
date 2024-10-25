@@ -11,26 +11,24 @@
 
 class OrderReader {
 public:
-  OrderReader(RingBuffer<Order> &buffer, OrderBook &orderBook, int min_price,
-              int max_price, int N, int M, int U);
+  OrderReader(RingBuffer<Order> &buffer, OrderBook &orderBook);
 
-  void readOrders();
+  void Read();
+
+  void ReadOrder();
+
+  void StopReader();
 
 private:
-  std::string validateAuthHash(const Order &order);
+  std::string ValidateAuthHash(const Order &order);
 
-  bool validateOrder(const Order &order);
+  bool ValidateOrder(const Order &order);
 
-  bool checkUserLimits(std::string user_hash, const Order &order);
+  bool CheckUserLimits(std::string user_hash, const Order &order);
 
-  static int32_t order_count;
-  RingBuffer<Order> &buffer;
-  OrderBook &orderBook;
-  int min_price;
-  int max_price;
-  int N; // max size
-  int M; // max orders count
-  int U; // users count
-
-  std::mutex mutex;
+  static int32_t order_count_;
+  RingBuffer<Order> &order_buffer_;
+  OrderBook &order_book_;
+  std::atomic_bool stop_reader_ = false;
+  std::mutex mutex_;
 };
