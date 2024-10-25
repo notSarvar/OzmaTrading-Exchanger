@@ -27,7 +27,7 @@ private:
 
   static int32_t order_count;
   RingBuffer<Order> &buffer;
-  OrderBook &orderBook;
+  OrderBook &order_book;
   std::atomic_bool stop_reader = false;
   std::mutex mutex;
 };

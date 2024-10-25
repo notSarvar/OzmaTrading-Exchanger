@@ -1,11 +1,11 @@
 #include "include/order_reader.h"
 
 OrderReader::OrderReader(RingBuffer<Order> &buffer, OrderBook &orderBook)
-    : buffer(buffer), orderBook(orderBook) {
+    : buffer(buffer), order_book(orderBook) {
   for (int i = 0; i < orderBook.U; ++i) {
     auto hash = "auth_hash_" + std::to_string(i);
     orderBook.auth_hashes.push_back(hash);
-    orderBook.userOrderLimits[hash] = OrderBook::UserOrderLimits();
+    orderBook.user_order_limits[hash] = OrderBook::UserOrderLimits();
   }
 }
 
@@ -22,16 +22,16 @@ void OrderReader::readOrders() {
             std::lock_guard<std::mutex> lock(mutex);
             switch (order.side) {
             case 0:
-              orderBook.userOrderLimits[user].buySize += order.size;
+              order_book.user_order_limits[user].buy_size += order.size;
               break;
             case 1:
-              orderBook.userOrderLimits[user].sellSize += order.size;
+              order_book.user_order_limits[user].sell_size += order.size;
               break;
             default:
-              orderBook.userOrderLimits[user].ordersCount++;
+              order_book.user_order_limits[user].orders_count++;
             }
           }
-          orderBook.addOrder(order_count++, order);
+          order_book.addOrder(order_count++, order);
         }
       } else {
         std::cerr << "Invalid auth_hash" << std::endl;
@@ -43,7 +43,7 @@ void OrderReader::readOrders() {
 }
 
 std::string OrderReader::validateAuthHash(const Order &order) {
-  for (const auto &user_hash : orderBook.auth_hashes) {
+  for (const auto &user_hash : order_book.auth_hashes) {
     if (generateAuthHash(order, user_hash) == order.auth_hash) {
       return user_hash;
     }
@@ -52,18 +52,19 @@ std::string OrderReader::validateAuthHash(const Order &order) {
 }
 
 bool OrderReader::validateOrder(const Order &order) {
-  return order.price >= orderBook.min_price &&
-         order.price <= orderBook.max_price && order.size > 0 &&
-         order.size <= orderBook.N && (order.side == 0 || order.side == 1);
+  return order.price >= order_book.min_price &&
+         order.price <= order_book.max_price && order.size > 0 &&
+         order.size <= order_book.N && (order.side == 0 || order.side == 1);
 }
 
 bool OrderReader::checkUserLimits(std::string user_hash, const Order &order) {
   std::lock_guard<std::mutex> lock(mutex);
-  auto ans = orderBook.userOrderLimits[user_hash].buySize + order.size <=
-                 orderBook.N &&
-             orderBook.userOrderLimits[user_hash].sellSize + order.size <=
-                 orderBook.N &&
-             orderBook.userOrderLimits[user_hash].ordersCount <= orderBook.M;
+  auto ans =
+      order_book.user_order_limits[user_hash].buy_size + order.size <=
+          order_book.N &&
+      order_book.user_order_limits[user_hash].sell_size + order.size <=
+          order_book.N &&
+      order_book.user_order_limits[user_hash].orders_count <= order_book.M;
   return ans;
 }
 
