@@ -18,3 +18,4 @@ add_executable(HWOzmaTradingAnalyze tests/analyze.cpp)
 target_link_libraries(HWOzmaTrading OzmaTradingLib)
 target_link_libraries(HWOzmaTradingTest OzmaTradingLib)
 target_link_libraries(HWOzmaTradingAnalyze OzmaTradingLib)
+

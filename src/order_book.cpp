@@ -1,5 +1,6 @@
 #include "include/order_book.h"
 #include "include/order.h"
+#include "include/timer_loger.h"
 
 void OrderBook::AddOrder(int32_t id, const Order &order) {
   std::lock_guard<std::mutex> lock(mutex_);
@@ -41,7 +42,10 @@ void OrderBook::MatchOrders() {
 
 void OrderBook::MatchUntil() {
   while (!stop_match_) {
-    MatchOrders();
+    {
+      TimeLogger logger("MatchOrders", "TimeLog.txt");
+      MatchOrders();
+    }
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 }

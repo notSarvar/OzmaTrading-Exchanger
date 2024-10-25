@@ -1,5 +1,6 @@
 #include "include/order_reader.h"
 #include "include/order.h"
+#include "include/timer_loger.h"
 
 OrderReader::OrderReader(RingBuffer<Order> &buffer, OrderBook &orderBook)
     : order_buffer_(buffer), order_book_(orderBook) {
@@ -15,8 +16,20 @@ int32_t OrderReader::order_count_ = 0;
 void OrderReader::ReadOrder() {
   Order order;
   if (order_buffer_.pop(order)) {
-    auto user = ValidateAuthHash(order);
+    std::string user = "";
+    {
+      TimeLogger logger("ReadOrder", "TimeLog.txt");
+      user = ValidateAuthHash(order);
+    }
     if (!user.empty()) {
+      bool check_limits = false;
+      bool validate_order = false;
+     {
+      TimeLogger logger("ValidateOrder", "TimeLog.txt");
+      check_limits = CheckUserLimits(user, order);
+      validate_order = ValidateOrder(order);
+     }
+
       if (CheckUserLimits(user, order) && ValidateOrder(order)) {
         {
           std::lock_guard<std::mutex> lock(mutex_);
@@ -31,7 +44,10 @@ void OrderReader::ReadOrder() {
             order_book_.user_order_limits_[user].orders_count++;
           }
         }
-        order_book_.AddOrder(order_count_++, order);
+        {
+          TimeLogger logger("AddOrder", "TimeLog.txt");
+          order_book_.AddOrder(order_count_++, order);
+        }
       }
     } else {
       std::cerr << "Invalid auth_hash" << std::endl;
@@ -41,7 +57,10 @@ void OrderReader::ReadOrder() {
 
 void OrderReader::Read() {
   while (!stop_reader_) {
+  {
+    TimeLogger logger("ReadOrder", "TimeLog.txt");
     ReadOrder();
+  }
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 }

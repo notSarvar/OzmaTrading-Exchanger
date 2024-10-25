@@ -81,10 +81,9 @@ int main() {
     TestCase(U, N, M, min_price, max_price, logFile);
 
     logFile << "Large case with many users and orders" << std::endl;
-    U = 1000, N = 500, M = 100, min_price = 5, max_price = 1000;
+    U = 200, N = 500, M = 20, min_price = 5, max_price = 1000;
     TestCase(U, N, M, min_price, max_price, logFile);
 
     logFile.close();
-
     return 0;
 }

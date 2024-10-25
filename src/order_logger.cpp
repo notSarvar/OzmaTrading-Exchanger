@@ -1,4 +1,5 @@
 #include "include/order_logger.h"
+#include "include/timer_loger.h"
 
 void OrderLogger::ExportLog() {
   std::string log;
@@ -12,7 +13,10 @@ void OrderLogger::ExportLog() {
 
 void OrderLogger::ExportLogUntil() {
   while (!stop_log_) {
-    ExportLog();
+    {
+      TimeLogger logger("ExportLog", "TimeLog.txt");
+      ExportLog();
+    }
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 }

@@ -1,5 +1,6 @@
 #include "include/order_generator.h"
 #include "include/hash_order.h"
+#include "include/timer_loger.h"
 
 OrderGenerator::OrderGenerator(RingBuffer<Order> &buffer, int32_t min_price,
                                int32_t max_price, int32_t N, int32_t U)
@@ -28,7 +29,10 @@ void OrderGenerator::GenerateOrder() {
 
 void OrderGenerator::GenerateUntil() {
   while (!stop_gen) {
-    GenerateOrder();
+    {
+      TimeLogger logger("GenerateOrder", "TimeLog.txt");
+      GenerateOrder();
+    }
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 }
