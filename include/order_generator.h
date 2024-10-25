@@ -9,8 +9,8 @@
 
 class OrderGenerator {
 public:
-  OrderGenerator(RingBuffer<Order> &buffer, int32_t min_price, int32_t max_price, int32_t N,
-                 int32_t U);
+  OrderGenerator(RingBuffer<Order> &buffer, int32_t min_price,
+                 int32_t max_price, int32_t N, int32_t U);
 
   void generate();
 

@@ -22,8 +22,8 @@ class OrderBook {
   friend class OrderReader;
 
 public:
-  OrderBook(OrderLogger &logger, int32_t min_price, int32_t max_price, int32_t N, int32_t M,
-            int32_t U)
+  OrderBook(OrderLogger &logger, int32_t min_price, int32_t max_price,
+            int32_t N, int32_t M, int32_t U)
       : logger(logger), min_price(min_price), max_price(max_price), N(N), M(M),
         U(U) {}
 
@@ -46,7 +46,6 @@ private:
   void updateOrders();
 
   std::string findUser(const Order &order);
-
 
   std::map<int32_t, std::vector<Order>> buy_orders;
   std::map<int32_t, std::vector<Order>> sell_orders;
