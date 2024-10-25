@@ -1,10 +1,8 @@
 #include "include/order_reader.h"
 
-OrderReader::OrderReader(RingBuffer<Order> &buffer, OrderBook &orderBook,
-                         int min_price, int max_price, int N, int M, int U)
-    : buffer(buffer), orderBook(orderBook), min_price(min_price),
-      max_price(max_price), N(N), M(M), U(U) {
-  for (int i = 0; i < U; ++i) {
+OrderReader::OrderReader(RingBuffer<Order> &buffer, OrderBook &orderBook)
+    : buffer(buffer), orderBook(orderBook) {
+  for (int i = 0; i < orderBook.U; ++i) {
     auto hash = "auth_hash_" + std::to_string(i);
     orderBook.auth_hashes.push_back(hash);
     orderBook.userOrderLimits[hash] = OrderBook::UserOrderLimits();
@@ -14,31 +12,32 @@ OrderReader::OrderReader(RingBuffer<Order> &buffer, OrderBook &orderBook,
 int32_t OrderReader::order_count = 0;
 
 void OrderReader::readOrders() {
-  while (true) {
+  while (!stop_reader) {
     Order order;
     if (buffer.pop(order)) {
-      try {
-        auto user = validateAuthHash(order);
+      auto user = validateAuthHash(order);
+      if (user != "Invalid auth_hash") {
         if (checkUserLimits(user, order) && validateOrder(order)) {
           {
             std::lock_guard<std::mutex> lock(mutex);
             switch (order.side) {
             case 0:
               orderBook.userOrderLimits[user].buySize += order.size;
-              orderBook.userOrderLimits[user].buy_orders.insert(order_count);
               break;
             case 1:
               orderBook.userOrderLimits[user].sellSize += order.size;
-              orderBook.userOrderLimits[user].sell_orders.insert(order_count);
               break;
+            default:
+              orderBook.userOrderLimits[user].ordersCount++;
             }
           }
           orderBook.addOrder(order_count++, order);
         }
-      } catch (const char *msg) {
-        std::cerr << msg << std::endl;
-        continue;
+      } else {
+        std::cerr << "Invalid auth_hash" << std::endl;
       }
+    } else {
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
   }
 }
@@ -49,21 +48,23 @@ std::string OrderReader::validateAuthHash(const Order &order) {
       return user_hash;
     }
   }
-  throw("Invalid auth_hash");
+  return "Invalid auth_hash";
 }
 
 bool OrderReader::validateOrder(const Order &order) {
-  return order.price >= min_price && order.price <= max_price &&
-         order.size > 0 && order.size <= N &&
-         (order.side == 0 || order.side == 1);
+  return order.price >= orderBook.min_price &&
+         order.price <= orderBook.max_price && order.size > 0 &&
+         order.size <= orderBook.N && (order.side == 0 || order.side == 1);
 }
 
 bool OrderReader::checkUserLimits(std::string user_hash, const Order &order) {
   std::lock_guard<std::mutex> lock(mutex);
-  auto ans = orderBook.userOrderLimits[user_hash].buySize + order.size <= N &&
-             orderBook.userOrderLimits[user_hash].sellSize + order.size <= N &&
-             orderBook.userOrderLimits[user_hash].buy_orders.size() +
-                     orderBook.userOrderLimits[user_hash].sell_orders.size() <=
-                 M;
+  auto ans = orderBook.userOrderLimits[user_hash].buySize + order.size <=
+                 orderBook.N &&
+             orderBook.userOrderLimits[user_hash].sellSize + order.size <=
+                 orderBook.N &&
+             orderBook.userOrderLimits[user_hash].ordersCount <= orderBook.M;
   return ans;
 }
+
+void OrderReader::stopReader() { stop_reader = true; }

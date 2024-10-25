@@ -1,5 +1,6 @@
 #pragma once
 
+#include <__atomic/aliases.h>
 #include <fstream>
 #include <string>
 
@@ -13,9 +14,12 @@ public:
 
   void log();
 
-  void logMatch(const Order &buy_order, const Order &sell_order);
+  void stopLogger();
+
+  void logMatch(const Order &buy_order, const Order &sell_order, int32_t size);
 
 private:
   RingBuffer<std::string> &buffer;
   std::string filename;
+  std::atomic_bool stop_log = false;
 };

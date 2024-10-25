@@ -4,6 +4,7 @@
 #include "order_book.h"
 #include "ring_buffer.hpp"
 
+#include <__atomic/aliases.h>
 #include <mutex>
 #include <string>
 #include <unordered_map>
@@ -11,10 +12,11 @@
 
 class OrderReader {
 public:
-  OrderReader(RingBuffer<Order> &buffer, OrderBook &orderBook, int min_price,
-              int max_price, int N, int M, int U);
+  OrderReader(RingBuffer<Order> &buffer, OrderBook &orderBook);
 
   void readOrders();
+
+  void stopReader();
 
 private:
   std::string validateAuthHash(const Order &order);
@@ -26,11 +28,6 @@ private:
   static int32_t order_count;
   RingBuffer<Order> &buffer;
   OrderBook &orderBook;
-  int min_price;
-  int max_price;
-  int N; // max size
-  int M; // max orders count
-  int U; // users count
-
+  std::atomic_bool stop_reader = false;
   std::mutex mutex;
 };

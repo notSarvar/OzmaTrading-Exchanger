@@ -25,15 +25,22 @@ int main(int argc, char **argv) {
   RingBuffer<std::string> logBuffer(U * M);
 
   OrderLogger logger(logBuffer, "orders.log");
-  OrderBook orderBook(logger);
+  OrderBook orderBook(logger, min_price, max_price, N, M, U);
 
   OrderGenerator generator(orderBuffer, min_price, max_price, N, U);
-  OrderReader reader(orderBuffer, orderBook, min_price, max_price, N, M, U);
+  OrderReader reader(orderBuffer, orderBook);
 
   std::thread generatorThread(&OrderGenerator::generate, &generator);
   std::thread readerThread(&OrderReader::readOrders, &reader);
   std::thread matcherThread(&OrderBook::match, &orderBook);
   std::thread loggerThread(&OrderLogger::log, &logger);
+
+  std::this_thread::sleep_for(std::chrono::seconds(10));
+
+  generator.stopGenerator();
+  reader.stopReader();
+  orderBook.stopMatch();
+  logger.stopLogger();
 
   generatorThread.join();
   readerThread.join();

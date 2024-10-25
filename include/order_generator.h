@@ -2,6 +2,7 @@
 
 #include "order.h"
 #include "ring_buffer.hpp"
+#include <__atomic/aliases.h>
 #include <random>
 #include <thread>
 #include <vector>
@@ -12,6 +13,8 @@ public:
                  int U);
 
   void generate();
+  
+  void stopGenerator();
 
 private:
   RingBuffer<Order> &buffer;
@@ -20,4 +23,5 @@ private:
   int max_price;
   int N;
   int U;
+  std::atomic_bool stop_gen = false;
 };

@@ -9,9 +9,9 @@ void testOrderBook() {
     RingBuffer<std::string> logBuffer(5);
 
     OrderLogger logger(logBuffer, "test_orders.log");
-    OrderBook orderBook(logger);
+    OrderBook orderBook(logger, 0, 200, 100, 100, 100);
 
-    OrderReader reader(orderBuffer, orderBook, 0, 200, 100, 100, 100);
+    OrderReader reader(orderBuffer, orderBook);
 
     // Добавляем ордера вручную
     Order buyOrder1 = {100, 10, 1, "user1"};
@@ -29,10 +29,18 @@ void testOrderBook() {
     Order sellOrder2 = {100, 7, 0, "user4"};
     hash = generateAuthHash(sellOrder1, "auth_hash_3");
     sellOrder2.auth_hash = hash;
-    
+    orderBook.addOrder(0, buyOrder1);
+    orderBook.addOrder(1, buyOrder2);
+    orderBook.addOrder(2, sellOrder1);
+    orderBook.addOrder(3, sellOrder2);
     std::thread readerThread(&OrderReader::readOrders, &reader);
     std::thread matcherThread(&OrderBook::match, &orderBook);
     std::thread loggerThread(&OrderLogger::log, &logger);
+    
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    reader.stopReader();
+    orderBook.stopMatch();
+    logger.stopLogger();
 
     readerThread.join();
     matcherThread.join();
