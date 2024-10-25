@@ -4,7 +4,6 @@
 #include "order_book.h"
 #include "ring_buffer.hpp"
 
-#include <__atomic/aliases.h>
 #include <mutex>
 #include <string>
 #include <unordered_map>
