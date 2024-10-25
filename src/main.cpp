@@ -1,11 +1,11 @@
+#include "include/order_generator.h"
+#include "include/order_logger.h"
+#include "include/order_reader.h"
+
 #include <iostream>
 #include <sstream>
 #include <thread>
 #include <vector>
-
-#include "include/order_generator.h"
-#include "include/order_logger.h"
-#include "include/order_reader.h"
 
 int main(int argc, char **argv) {
   if (argc != 6) {
