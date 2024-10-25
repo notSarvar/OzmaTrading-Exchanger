@@ -12,10 +12,11 @@ public:
         auto end = std::chrono::high_resolution_clock::now();
         std::ofstream file(export_filename_, std::ios::app);
         std::chrono::duration<double> duration = end - start_;
-        file << stage_ << ": " << duration.count() << " seconds" << std::endl;
+        std::string result = stage_ + ": " + std::to_string(duration.count()) + " seconds\n";
+        file << result;
     }
 private:
     std::string stage_;
     std::string export_filename_;    
     std::chrono::high_resolution_clock::time_point start_;  
-};
+}; 
