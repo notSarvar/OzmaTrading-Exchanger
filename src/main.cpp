@@ -1,9 +1,11 @@
 #include "include/order_generator.h"
 #include "include/order_logger.h"
 #include "include/order_reader.h"
+#include "include/timer_loger.h"
 
 #include <iostream>
 #include <sstream>
+#include <string>
 #include <thread>
 #include <vector>
 
@@ -46,6 +48,8 @@ int main(int argc, char **argv) {
   readerThread.join();
   matcherThread.join();
   loggerThread.join();
+
+  ExportTimelogs("result.txt");
 
   return 0;
 }
