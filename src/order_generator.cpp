@@ -1,8 +1,8 @@
 #include "include/order_generator.h"
 #include "include/hash_order.h"
-#include <iostream>
-OrderGenerator::OrderGenerator(RingBuffer<Order> &buffer, int min_price,
-                               int max_price, int N, int U)
+
+OrderGenerator::OrderGenerator(RingBuffer<Order> &buffer, int32_t min_price,
+                               int32_t max_price, int32_t N, int32_t U)
     : buffer(buffer), min_price(min_price), max_price(max_price), N(N), U(U) {
   for (int i = 0; i < U; ++i) {
     auto hash = "auth_hash_" + std::to_string(i);

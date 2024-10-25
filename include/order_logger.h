@@ -3,6 +3,7 @@
 #include <__atomic/aliases.h>
 #include <fstream>
 #include <string>
+#include <thread>
 
 #include "order.h"
 #include "ring_buffer.hpp"

@@ -1,5 +1,4 @@
 #include "include/order_logger.h"
-#include <string>
 
 void OrderLogger::log() {
   while (!stop_log) {
@@ -7,6 +6,8 @@ void OrderLogger::log() {
     if (buffer.pop(log)) {
       std::ofstream file(filename, std::ios::app);
       file << log << std::endl;
+    } else {
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
   }
 }

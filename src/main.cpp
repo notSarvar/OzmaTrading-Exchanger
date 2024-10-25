@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  int U, N, M, min_price, max_price;
+  int32_t U, N, M, min_price, max_price;
   std::istringstream(argv[1]) >> U;
   std::istringstream(argv[2]) >> N;
   std::istringstream(argv[3]) >> M;

@@ -42,7 +42,7 @@ void OrderBook::match() {
   }
 }
 
-void OrderBook::updateUserLimits(const std::string &auth_hash, int size,
+void OrderBook::updateUserLimits(const std::string &auth_hash, int32_t size,
                                  int side, bool is_add) {
   auto &limits = user_order_limits[auth_hash];
   if (side == 1) { // Buy
@@ -59,7 +59,7 @@ std::string OrderBook::get_user(const Order &order) {
       return user_hash;
     }
   }
-  return "";
+  return ""; // Invalid auth_hash should I throw an exception?
 }
 
 void OrderBook::stopMatch() { stop_match = true; }

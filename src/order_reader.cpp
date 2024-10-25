@@ -16,7 +16,7 @@ void OrderReader::readOrders() {
     Order order;
     if (buffer.pop(order)) {
       auto user = validateAuthHash(order);
-      if (user != "Invalid auth_hash") {
+      if (!user.empty()) {
         if (checkUserLimits(user, order) && validateOrder(order)) {
           {
             std::lock_guard<std::mutex> lock(mutex);
@@ -48,7 +48,7 @@ std::string OrderReader::validateAuthHash(const Order &order) {
       return user_hash;
     }
   }
-  return "Invalid auth_hash";
+  return ""; // Invalid auth_hash should I throw an exception?
 }
 
 bool OrderReader::validateOrder(const Order &order) {

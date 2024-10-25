@@ -9,8 +9,8 @@
 
 class OrderGenerator {
 public:
-  OrderGenerator(RingBuffer<Order> &buffer, int min_price, int max_price, int N,
-                 int U);
+  OrderGenerator(RingBuffer<Order> &buffer, int32_t min_price, int32_t max_price, int32_t N,
+                 int32_t U);
 
   void generate();
 
@@ -19,9 +19,9 @@ public:
 private:
   RingBuffer<Order> &buffer;
   std::vector<std::string> auth_hashes;
-  int min_price;
-  int max_price;
-  int N;
-  int U;
+  int32_t min_price;
+  int32_t max_price;
+  int32_t N;
+  int32_t U;
   std::atomic_bool stop_gen = false;
 };

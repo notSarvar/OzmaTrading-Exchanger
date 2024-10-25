@@ -22,8 +22,8 @@ class OrderBook {
   friend class OrderReader;
 
 public:
-  OrderBook(OrderLogger &logger, int min_price, int max_price, int N, int M,
-            int U)
+  OrderBook(OrderLogger &logger, int32_t min_price, int32_t max_price, int32_t N, int32_t M,
+            int32_t U)
       : logger(logger), min_price(min_price), max_price(max_price), N(N), M(M),
         U(U) {}
 
@@ -42,7 +42,7 @@ private:
     int32_t orders_count = 0;
   };
 
-  void updateUserLimits(const std::string &auth_hash, int size, int side,
+  void updateUserLimits(const std::string &auth_hash, int32_t size, int side,
                         bool is_add = false);
 
   void updateBestPrices();
@@ -55,11 +55,11 @@ private:
   OrderLogger &logger;
   std::mutex mutex;
   std::atomic_bool stop_match = false;
-  int min_price;
-  int max_price;
-  int N; // max size
-  int M; // max orders count
-  int U; // users count
+  int32_t min_price;
+  int32_t max_price;
+  int32_t N; // max size
+  int32_t M; // max orders count
+  int32_t U; // users count
   int32_t best_bid_price = 0;
   int32_t best_ask_price = std::numeric_limits<int32_t>::max();
 };
