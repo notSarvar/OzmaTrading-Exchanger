@@ -7,7 +7,7 @@ void OrderBook::addOrder(int32_t id, const Order &order) {
   } else {
     sell_orders[order.price].push_back(order);
   }
-  updateUserLimits(get_user(order), -order.size, order.side, true);
+  updateUserLimits(findUser(order), -order.size, order.side, true);
 }
 
 void OrderBook::match() {
@@ -30,13 +30,14 @@ void OrderBook::match() {
                 sell_order_pair.size -= amount;
                 logger.logMatch(buy_order_pair, sell_order_pair, amount);
 
-                updateUserLimits(get_user(buy_order_pair), amount, 1);
-                updateUserLimits(get_user(sell_order_pair), amount, 0);
+                updateUserLimits(findUser(buy_order_pair), amount, 1);
+                updateUserLimits(findUser(sell_order_pair), amount, 0);
               }
             }
           }
         }
       }
+      updateOrders();
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
@@ -53,13 +54,29 @@ void OrderBook::updateUserLimits(const std::string &auth_hash, int32_t size,
   limits.orders_count += is_add ? 1 : -1;
 }
 
-std::string OrderBook::get_user(const Order &order) {
+std::string OrderBook::findUser(const Order &order) {
   for (const auto &user_hash : auth_hashes) {
     if (generateAuthHash(order, user_hash) == order.auth_hash) {
       return user_hash;
     }
   }
   return ""; // Invalid auth_hash should I throw an exception?
+}
+
+void OrderBook::updateOrders() {
+  for (auto &buy_pair : buy_orders) {
+    buy_pair.second.erase(
+        std::remove_if(buy_pair.second.begin(), buy_pair.second.end(),
+                       [](const Order &order) { return order.size == 0; }),
+        buy_pair.second.end());
+  }
+
+  for (auto &sell_pair : sell_orders) {
+    sell_pair.second.erase(
+        std::remove_if(sell_pair.second.begin(), sell_pair.second.end(),
+                       [](const Order &order) { return order.size == 0; }),
+        sell_pair.second.end());
+  }
 }
 
 void OrderBook::stopMatch() { stop_match = true; }

@@ -33,8 +33,6 @@ public:
 
   void match();
 
-  std::string get_user(const Order &order);
-
 private:
   struct UserOrderLimits {
     int32_t buy_size = 0;
@@ -45,11 +43,13 @@ private:
   void updateUserLimits(const std::string &auth_hash, int32_t size, int side,
                         bool is_add = false);
 
-  void updateBestPrices();
+  void updateOrders();
+
+  std::string findUser(const Order &order);
+
 
   std::map<int32_t, std::vector<Order>> buy_orders;
   std::map<int32_t, std::vector<Order>> sell_orders;
-
   std::vector<std::string> auth_hashes;
   std::unordered_map<std::string, UserOrderLimits> user_order_limits;
   OrderLogger &logger;
