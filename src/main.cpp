@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
   matcherThread.join();
   loggerThread.join();
 
-  ExportTimelogs("result.txt");
+  ExportTimelogs("TimeLog.txt");
 
   return 0;
 }

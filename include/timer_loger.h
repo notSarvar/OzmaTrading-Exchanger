@@ -4,6 +4,8 @@
 
 #include <fstream>
 #include <iostream>
+#include <chrono>
+#include <string>
 
 extern RingBuffer<std::string> Timelogs;
 
