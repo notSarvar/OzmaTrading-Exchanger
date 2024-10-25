@@ -33,7 +33,7 @@ void testOrderBook() {
     orderBook.addOrder(1, buyOrder2);
     orderBook.addOrder(2, sellOrder1);
     orderBook.addOrder(3, sellOrder2);
-    std::thread readerThread(&OrderReader::readOrders, &reader);
+    std::thread readerThread(&OrderReader::readOrder, &reader);
     std::thread matcherThread(&OrderBook::match, &orderBook);
     std::thread loggerThread(&OrderLogger::log, &logger);
     

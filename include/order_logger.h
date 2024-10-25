@@ -15,6 +15,8 @@ public:
 
   void log();
 
+  void logOrder();
+
   void stopLogger();
 
   void logMatch(const Order &buy_order, const Order &sell_order, int32_t size);

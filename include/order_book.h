@@ -33,6 +33,8 @@ public:
 
   void match();
 
+  void matchOrders();
+
 private:
   struct UserOrderLimits {
     int32_t buy_size = 0;

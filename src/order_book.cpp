@@ -10,35 +10,37 @@ void OrderBook::addOrder(int32_t id, const Order &order) {
   updateUserLimits(findUser(order), -order.size, order.side, true);
 }
 
-void OrderBook::match() {
-  while (!stop_match) {
-    {
-      std::lock_guard<std::mutex> lock(mutex);
-      for (auto &buy_pair : buy_orders) {
-        for (auto &sell_pair : sell_orders) {
-          auto &buy_order_set = buy_pair.second;
-          auto &sell_order_set = sell_pair.second;
+void OrderBook::matchOrders() {
+  std::lock_guard<std::mutex> lock(mutex);
+  for (auto &buy_pair : buy_orders) {
+    for (auto &sell_pair : sell_orders) {
+      auto &buy_orders = buy_pair.second;
+      auto &sell_orders = sell_pair.second;
 
-          for (auto &buy_order_pair : buy_order_set) {
-            for (auto &sell_order_pair : sell_order_set) {
-              if (buy_order_pair.price >= sell_order_pair.price &&
-                  buy_order_pair.size > 0 && sell_order_pair.size > 0) {
+      for (auto &buy_order : buy_orders) {
+        for (auto &sell_order : sell_orders) {
+          if (buy_order.price >= sell_order.price &&
+              buy_order.size > 0 && sell_order.size > 0) {
 
-                int32_t amount =
-                    std::min(buy_order_pair.size, sell_order_pair.size);
-                buy_order_pair.size -= amount;
-                sell_order_pair.size -= amount;
-                logger.logMatch(buy_order_pair, sell_order_pair, amount);
+            int32_t amount =
+                std::min(buy_order.size, sell_order.size);
+            buy_order.size -= amount;
+            sell_order.size -= amount;
+            logger.logMatch(buy_order, sell_order, amount);
 
-                updateUserLimits(findUser(buy_order_pair), amount, 1);
-                updateUserLimits(findUser(sell_order_pair), amount, 0);
-              }
-            }
+            updateUserLimits(findUser(buy_order), amount, 1);
+            updateUserLimits(findUser(sell_order), amount, 0);
           }
         }
       }
-      updateOrders();
     }
+  }
+  updateOrders();
+}
+
+void OrderBook::match() {
+  while (!stop_match) {
+    matchOrders();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 }

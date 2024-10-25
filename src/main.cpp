@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
   OrderReader reader(orderBuffer, orderBook);
 
   std::thread generatorThread(&OrderGenerator::generate, &generator);
-  std::thread readerThread(&OrderReader::readOrders, &reader);
+  std::thread readerThread(&OrderReader::read, &reader);
   std::thread matcherThread(&OrderBook::match, &orderBook);
   std::thread loggerThread(&OrderLogger::log, &logger);
 

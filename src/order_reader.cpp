@@ -11,34 +11,37 @@ OrderReader::OrderReader(RingBuffer<Order> &buffer, OrderBook &orderBook)
 
 int32_t OrderReader::order_count = 0;
 
-void OrderReader::readOrders() {
-  while (!stop_reader) {
-    Order order;
-    if (buffer.pop(order)) {
-      auto user = validateAuthHash(order);
-      if (!user.empty()) {
-        if (checkUserLimits(user, order) && validateOrder(order)) {
-          {
-            std::lock_guard<std::mutex> lock(mutex);
-            switch (order.side) {
-            case 0:
-              order_book.user_order_limits[user].buy_size += order.size;
-              break;
-            case 1:
-              order_book.user_order_limits[user].sell_size += order.size;
-              break;
-            default:
-              order_book.user_order_limits[user].orders_count++;
-            }
+void OrderReader::readOrder() {
+  Order order;
+  if (buffer.pop(order)) {
+    auto user = validateAuthHash(order);
+    if (!user.empty()) {
+      if (checkUserLimits(user, order) && validateOrder(order)) {
+        {
+          std::lock_guard<std::mutex> lock(mutex);
+          switch (order.side) {
+          case 0:
+            order_book.user_order_limits[user].buy_size += order.size;
+            break;
+          case 1:
+            order_book.user_order_limits[user].sell_size += order.size;
+            break;
+          default:
+            order_book.user_order_limits[user].orders_count++;
           }
-          order_book.addOrder(order_count++, order);
         }
-      } else {
-        std::cerr << "Invalid auth_hash" << std::endl;
+        order_book.addOrder(order_count++, order);
       }
     } else {
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+      std::cerr << "Invalid auth_hash" << std::endl;
     }
+  } 
+}
+
+void OrderReader::read() {
+  while (!stop_reader) {
+    readOrder();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 }
 

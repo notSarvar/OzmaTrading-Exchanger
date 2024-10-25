@@ -16,6 +16,8 @@ public:
 
   void stopGenerator();
 
+  void generateOrder();
+
 private:
   RingBuffer<Order> &buffer;
   std::vector<std::string> auth_hashes;

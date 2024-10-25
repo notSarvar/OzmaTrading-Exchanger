@@ -17,3 +17,11 @@ add_executable(HWOzmaTradingTest tests/test.cpp ${HEADERS}
     src/order_logger.cpp
     src/order_reader.cpp
 )
+
+add_executable(HWOzmaTradingAnalyze tests/analyze.cpp ${HEADERS}
+    src/order_generator.cpp
+    src/order_book.cpp
+    src/hash_order.cpp
+    src/order_logger.cpp
+    src/order_reader.cpp
+)

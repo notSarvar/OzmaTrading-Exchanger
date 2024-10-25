@@ -14,7 +14,9 @@ class OrderReader {
 public:
   OrderReader(RingBuffer<Order> &buffer, OrderBook &orderBook);
 
-  void readOrders();
+  void read();
+
+  void readOrder();
 
   void stopReader();
 
