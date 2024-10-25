@@ -3,7 +3,9 @@
 void OrderLogger::ExportLog() {
   std::string log;
   if (log_buffer_.pop(log)) {
-    std::ofstream file(export_filename_, std::ios::app);
+    static bool first_open_ = true;
+    std::ofstream file(export_filename_, first_open_ ? std::ios::trunc : std::ios::app);
+    first_open_ = false;
     file << log << std::endl;
   }
 }
