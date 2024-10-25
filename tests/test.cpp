@@ -1,9 +1,10 @@
-#include <iostream>
 #include "include/order.h"
 #include "include/order_book.h"
 #include "include/order_logger.h"
 #include "include/order_reader.h"
 #include "include/hash_order.h"
+
+#include <iostream>
 
 void testOrderBook() {
     RingBuffer<Order> orderBuffer(5);

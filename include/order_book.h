@@ -1,5 +1,10 @@
 #pragma once
 
+#include "hash_order.h"
+#include "order.h"
+#include "order_logger.h"
+#include "ring_buffer.hpp"
+
 #include <algorithm>
 #include <chrono>
 #include <cstddef>
@@ -12,11 +17,6 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
-
-#include "hash_order.h"
-#include "order.h"
-#include "order_logger.h"
-#include "ring_buffer.hpp"
 
 class OrderBook {
   friend class OrderReader;

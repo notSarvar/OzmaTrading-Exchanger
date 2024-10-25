@@ -1,3 +1,8 @@
+#include "include/order_generator.h"
+#include "include/order_reader.h"
+#include "include/order_logger.h"
+#include "include/order_book.h"
+
 #include <iostream>
 #include <chrono>
 #include <fstream>
@@ -5,11 +10,6 @@
 #include <thread>
 #include <vector>
 #include <sstream>
-
-#include "include/order_generator.h"
-#include "include/order_reader.h"
-#include "include/order_logger.h"
-#include "include/order_book.h"
 
 void measureTime(const std::string& stage, const std::function<void()>& func, std::ofstream& logFile, int32_t cnt = 1) {
     auto start = std::chrono::high_resolution_clock::now();

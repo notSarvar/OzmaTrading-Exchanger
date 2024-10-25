@@ -1,12 +1,12 @@
 #pragma once
 
+#include "order.h"
+#include "ring_buffer.hpp"
+
 #include <__atomic/aliases.h>
 #include <fstream>
 #include <string>
 #include <thread>
-
-#include "order.h"
-#include "ring_buffer.hpp"
 
 class OrderLogger {
 public:
