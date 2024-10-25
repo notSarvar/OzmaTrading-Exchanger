@@ -12,10 +12,6 @@ file(GLOB_RECURSE HEADERS "include/*.h" "include/*.hpp")
 add_library(OzmaTradingLib STATIC ${SOURCES} ${HEADERS})
 
 add_executable(HWOzmaTrading src/main.cpp)
-add_executable(HWOzmaTradingTest tests/test.cpp)
-add_executable(HWOzmaTradingAnalyze tests/analyze.cpp)
 
 target_link_libraries(HWOzmaTrading OzmaTradingLib)
-target_link_libraries(HWOzmaTradingTest OzmaTradingLib)
-target_link_libraries(HWOzmaTradingAnalyze OzmaTradingLib)
 

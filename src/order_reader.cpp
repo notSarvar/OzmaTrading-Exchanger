@@ -18,7 +18,7 @@ void OrderReader::ReadOrder() {
   if (order_buffer_.pop(order)) {
     std::string user = "";
     {
-      TimeLogger logger("ReadOrder", "TimeLog.txt");
+      TimeLogger logger("ValidateAuthHash", "TimeLog.txt");
       user = ValidateAuthHash(order);
     }
     if (!user.empty()) {
