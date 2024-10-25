@@ -30,17 +30,17 @@ int main(int argc, char **argv) {
   OrderGenerator generator(orderBuffer, min_price, max_price, N, U);
   OrderReader reader(orderBuffer, orderBook);
 
-  std::thread generatorThread(&OrderGenerator::generate, &generator);
-  std::thread readerThread(&OrderReader::read, &reader);
-  std::thread matcherThread(&OrderBook::match, &orderBook);
-  std::thread loggerThread(&OrderLogger::log, &logger);
+  std::thread generatorThread(&OrderGenerator::GenerateUntil, &generator);
+  std::thread readerThread(&OrderReader::Read, &reader);
+  std::thread matcherThread(&OrderBook::MatchUntil, &orderBook);
+  std::thread loggerThread(&OrderLogger::ExportLogUntil, &logger);
 
   std::this_thread::sleep_for(std::chrono::seconds(10));
 
-  generator.stopGenerator();
-  reader.stopReader();
-  orderBook.stopMatch();
-  logger.stopLogger();
+  generator.StopGenerator();
+  reader.StopReader();
+  orderBook.StopMatch();
+  logger.StopExport();
 
   generatorThread.join();
   readerThread.join();

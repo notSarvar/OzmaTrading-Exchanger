@@ -6,4 +6,4 @@
 #include <sstream>
 #include <string>
 
-std::string generateAuthHash(const Order &order, const std::string &userKey);
+std::string GenerateAuthHash(const Order &order, const std::string &userKey);

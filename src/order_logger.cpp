@@ -1,29 +1,32 @@
 #include "include/order_logger.h"
 
-void OrderLogger::logOrder() {
+void OrderLogger::ExportLog() {
   std::string log;
-  if (buffer.pop(log)) {
-    std::ofstream file(filename, std::ios::app);
+  if (log_buffer_.pop(log)) {
+    std::ofstream file(export_filename_, std::ios::app);
     file << log << std::endl;
   }
 }
 
-void OrderLogger::log() {
-  while (!stop_log) {
-    logOrder();
+void OrderLogger::ExportLogUntil() {
+  while (!stop_log_) {
+    ExportLog();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 }
 
-void OrderLogger::logMatch(const Order &buy_order, const Order &sell_order,
+void OrderLogger::LogMatched(const Order &buy_order, const Order &sell_order,
                            int32_t size) {
-  std::string log =
-      "Matched{\n Buy order:\n\tPrice: " + std::to_string(buy_order.price) + "\n\tSize left: " + std::to_string(buy_order.size) +
-      " With hash: " + buy_order.auth_hash +
-      "\n Sell order:\n\tPrice: " + std::to_string(sell_order.price) +"\n\tSize left: " + std::to_string(sell_order.size) +
-      " With hash: " + sell_order.auth_hash +
-      " \n Amount: " + std::to_string(size) + "\n}";
-  buffer.push(log);
+  std::ostringstream log_stream;
+  log_stream << "Matched {\n Buy order:\n\tPrice: " << buy_order.price 
+             << "\n\tSize left: " << buy_order.size 
+             << "\n\tHash: " << buy_order.auth_hash 
+             << "\n Sell order:\n\tPrice: " << sell_order.price 
+             << "\n\tSize left: " << sell_order.size 
+             << "\n\tHash: " << sell_order.auth_hash 
+             << " \n Amount: " << size << "\n}";
+  std::string log = log_stream.str();
+  log_buffer_.push(log);
 }
 
-void OrderLogger::stopLogger() { stop_log = true; }
+void OrderLogger::StopExport() { stop_log_ = true; }

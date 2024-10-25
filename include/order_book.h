@@ -24,16 +24,16 @@ class OrderBook {
 public:
   OrderBook(OrderLogger &logger, int32_t min_price, int32_t max_price,
             int32_t N, int32_t M, int32_t U)
-      : logger(logger), min_price(min_price), max_price(max_price), N(N), M(M),
-        U(U) {}
+      : logger_(logger), min_price_(min_price), max_price_(max_price), N_(N), M_(M),
+        U_(U) {}
 
-  void stopMatch();
+  void StopMatch();
 
-  void addOrder(int32_t id, const Order &order);
+  void AddOrder(int32_t id, const Order &order);
 
-  void match();
+  void MatchUntil();
 
-  void matchOrders();
+  void MatchOrders();
 
 private:
   struct UserOrderLimits {
@@ -42,25 +42,23 @@ private:
     int32_t orders_count = 0;
   };
 
-  void updateUserLimits(const std::string &auth_hash, int32_t size, int side,
+  void UpdateUserLimits(const std::string &auth_hash, int32_t size, Order::Side side,
                         bool is_add = false);
 
-  void updateOrders();
+  void UpdateOrders();
 
-  std::string findUser(const Order &order);
+  std::string FindUser(const Order &order);
 
-  std::map<int32_t, std::vector<Order>> buy_orders;
-  std::map<int32_t, std::vector<Order>> sell_orders;
-  std::vector<std::string> auth_hashes;
-  std::unordered_map<std::string, UserOrderLimits> user_order_limits;
-  OrderLogger &logger;
-  std::mutex mutex;
-  std::atomic_bool stop_match = false;
-  int32_t min_price;
-  int32_t max_price;
-  int32_t N; // max size
-  int32_t M; // max orders count
-  int32_t U; // users count
-  int32_t best_bid_price = 0;
-  int32_t best_ask_price = std::numeric_limits<int32_t>::max();
+  std::map<int32_t, std::vector<Order>> buy_orders_;
+  std::map<int32_t, std::vector<Order>> sell_orders_;
+  std::vector<std::string> user_auth_hashes_;
+  std::unordered_map<std::string, UserOrderLimits> user_order_limits_;
+  OrderLogger &logger_;
+  std::mutex mutex_;
+  std::atomic_bool stop_match_ = false;
+  int32_t min_price_;
+  int32_t max_price_;
+  int32_t N_; // max size
+  int32_t M_; // max orders count
+  int32_t U_; // users count
 };

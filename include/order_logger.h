@@ -11,18 +11,18 @@
 class OrderLogger {
 public:
   OrderLogger(RingBuffer<std::string> &buffer, const std::string &filename)
-      : buffer(buffer), filename(filename) {}
+      : log_buffer_(buffer), export_filename_(filename) {}
 
-  void log();
+  void ExportLogUntil();
 
-  void logOrder();
+  void ExportLog();
 
-  void stopLogger();
+  void StopExport();
 
-  void logMatch(const Order &buy_order, const Order &sell_order, int32_t size);
+  void LogMatched(const Order &buy_order, const Order &sell_order, int32_t size);
 
 private:
-  RingBuffer<std::string> &buffer;
-  std::string filename;
-  std::atomic_bool stop_log = false;
+  RingBuffer<std::string> &log_buffer_;
+  std::string export_filename_;
+  std::atomic_bool stop_log_ = false;
 };

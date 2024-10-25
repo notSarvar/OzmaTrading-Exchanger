@@ -14,22 +14,22 @@ class OrderReader {
 public:
   OrderReader(RingBuffer<Order> &buffer, OrderBook &orderBook);
 
-  void read();
+  void Read();
 
-  void readOrder();
+  void ReadOrder();
 
-  void stopReader();
+  void StopReader();
 
 private:
-  std::string validateAuthHash(const Order &order);
+  std::string ValidateAuthHash(const Order &order);
 
-  bool validateOrder(const Order &order);
+  bool ValidateOrder(const Order &order);
 
-  bool checkUserLimits(std::string user_hash, const Order &order);
+  bool CheckUserLimits(std::string user_hash, const Order &order);
 
-  static int32_t order_count;
-  RingBuffer<Order> &buffer;
-  OrderBook &order_book;
-  std::atomic_bool stop_reader = false;
-  std::mutex mutex;
+  static int32_t order_count_;
+  RingBuffer<Order> &order_buffer_;
+  OrderBook &order_book_;
+  std::atomic_bool stop_reader_ = false;
+  std::mutex mutex_;
 };
